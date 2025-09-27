@@ -42,6 +42,32 @@
             font-size: 1.1em;
         }
 
+        .connection-status {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: rgba(255,255,255,0.9);
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 0.9em;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .connection-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: #f87171;
+        }
+
+        .connection-dot.connected {
+            background: #4ade80;
+            animation: pulse 2s infinite;
+        }
+
         .main-card {
             background: white;
             border-radius: 20px;
@@ -62,6 +88,28 @@
 
         .status-info {
             color: white;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .nickname-display {
+            background: rgba(255,255,255,0.2);
+            padding: 8px 15px;
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .nickname-display .edit-icon {
+            cursor: pointer;
+            opacity: 0.8;
+            transition: opacity 0.3s;
+        }
+
+        .nickname-display .edit-icon:hover {
+            opacity: 1;
         }
 
         .status-indicator {
@@ -86,6 +134,65 @@
         #map {
             height: 500px;
             width: 100%;
+            position: relative;
+        }
+
+        .users-list {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            background: white;
+            border-radius: 12px;
+            padding: 15px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            z-index: 1000;
+            max-width: 250px;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+
+        .users-list h3 {
+            margin: 0 0 10px 0;
+            color: #667eea;
+            font-size: 1em;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .user-item {
+            padding: 8px;
+            border-radius: 8px;
+            margin-bottom: 5px;
+            background: #f8fafc;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: background 0.3s;
+        }
+
+        .user-item:hover {
+            background: #e2e8f0;
+        }
+
+        .user-item.me {
+            background: #d1fae5;
+            font-weight: bold;
+        }
+
+        .user-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            flex-shrink: 0;
+        }
+
+        .user-dot.active {
+            background: #4ade80;
+        }
+
+        .user-dot.other {
+            background: #667eea;
         }
 
         .btn {
@@ -166,6 +273,94 @@
             margin-top: 5px;
         }
 
+        /* Modal styles */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 2000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+            animation: fadeIn 0.3s;
+        }
+
+        .modal.active {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-content {
+            background: white;
+            padding: 30px;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            max-width: 400px;
+            width: 90%;
+            animation: slideUp 0.3s;
+        }
+
+        .modal-content h2 {
+            margin: 0 0 20px 0;
+            color: #667eea;
+        }
+
+        .input-group {
+            margin-bottom: 20px;
+        }
+
+        .input-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #64748b;
+            font-size: 0.9em;
+        }
+
+        .input-group input {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e2e8f0;
+            border-radius: 10px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+
+        .input-group input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .modal-buttons {
+            display: flex;
+            gap: 10px;
+            justify-content: flex-end;
+        }
+
+        .btn-secondary {
+            background: #e2e8f0;
+            color: #64748b;
+        }
+
+        .btn-secondary:hover {
+            background: #cbd5e1;
+        }
+
+        /* Custom marker labels */
+        .marker-label {
+            position: absolute;
+            background: white;
+            padding: 4px 8px;
+            border-radius: 8px;
+            font-size: 12px;
+            font-weight: 600;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+            white-space: nowrap;
+            transform: translate(-50%, -35px);
+            pointer-events: none;
+        }
+
         .user-marker {
             background: #667eea;
             border: 3px solid white;
@@ -228,6 +423,15 @@
             display: none;
         }
 
+        .success-message {
+            background: #d1fae5;
+            color: #065f46;
+            padding: 15px;
+            border-radius: 10px;
+            margin: 15px 0;
+            display: none;
+        }
+
         @media (max-width: 768px) {
             .header h1 {
                 font-size: 1.8em;
@@ -241,11 +445,26 @@
                 justify-content: center;
                 text-align: center;
             }
+
+            .connection-status {
+                top: 10px;
+                right: 10px;
+                font-size: 0.8em;
+            }
+
+            .users-list {
+                max-width: 180px;
+            }
         }
     </style>
 </head>
 <body>
     <div class="container">
+        <div class="connection-status">
+            <div class="connection-dot" id="connectionDot"></div>
+            <span id="connectionText">Connecting...</span>
+        </div>
+
         <div class="header">
             <h1>🌍 Live Location Broadcaster</h1>
             <p>Share your location in real-time with everyone on this page</p>
@@ -254,8 +473,14 @@
         <div class="main-card">
             <div class="controls">
                 <div class="status-info">
-                    <span class="status-indicator inactive" id="statusIndicator"></span>
-                    <span id="statusText">Not sharing location</span>
+                    <div>
+                        <span class="status-indicator inactive" id="statusIndicator"></span>
+                        <span id="statusText">Not sharing location</span>
+                    </div>
+                    <div class="nickname-display" id="nicknameDisplay">
+                        <span id="currentNickname">Anonymous</span>
+                        <span class="edit-icon" onclick="showNicknameModal()">✏️</span>
+                    </div>
                 </div>
                 <div>
                     <button class="btn btn-primary" id="startBtn" onclick="startSharing()">
@@ -267,10 +492,16 @@
                 </div>
             </div>
 
-            <div id="map"></div>
+            <div id="map">
+                <div class="users-list" id="usersList">
+                    <h3>👥 Active Users (<span id="userCount">0</span>)</h3>
+                    <div id="usersContainer"></div>
+                </div>
+            </div>
 
             <div class="info-panel">
                 <div class="error-message" id="errorMessage"></div>
+                <div class="success-message" id="successMessage"></div>
                 <div class="stats">
                     <div class="stat-card">
                         <div class="stat-value" id="activeUsers">0</div>
@@ -289,8 +520,29 @@
         </div>
     </div>
 
+    <!-- Nickname Modal -->
+    <div class="modal" id="nicknameModal">
+        <div class="modal-content">
+            <h2>Set Your Nickname</h2>
+            <div class="input-group">
+                <label for="nicknameInput">Choose a nickname (3-20 characters)</label>
+                <input 
+                    type="text" 
+                    id="nicknameInput" 
+                    placeholder="Enter your nickname" 
+                    maxlength="20"
+                    onkeypress="if(event.key==='Enter') saveNickname()"
+                >
+            </div>
+            <div class="modal-buttons">
+                <button class="btn btn-secondary" onclick="closeNicknameModal()">Cancel</button>
+                <button class="btn btn-primary" onclick="saveNickname()">Save</button>
+            </div>
+        </div>
+    </div>
+
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-    <script src="https://cdn.socket.io/4.5.4/socket.io.min.js"></script>
+    <script src="/socket.io/socket.io.js"></script>
     <script>
         // Initialize variables
         let map;
@@ -298,57 +550,236 @@
         let markers = {};
         let socket;
         let watchId;
-        let userId = 'user_' + Math.random().toString(36).substr(2, 9);
         let updateCounter = 0;
         let isSharing = false;
+        let isConnected = false;
+        let myNickname = localStorage.getItem('userNickname') || 'Anonymous';
+        let activeUsersList = new Map();
+
+        // Set initial nickname display
+        document.getElementById('currentNickname').textContent = myNickname;
 
         // Initialize map
         function initMap() {
-            map = L.map('map').setView([51.505, -0.09], 13);
+            // Default to a central location
+            map = L.map('map').setView([40.7128, -74.0060], 2);
             
-            // Add dark tile layer for better contrast
+            // Add tile layer
             L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
                 attribution: '© OpenStreetMap contributors',
                 maxZoom: 19
             }).addTo(map);
         }
 
-        // Initialize WebSocket connection
+        // Initialize Socket.io connection
         function initSocket() {
-            // Using a public WebSocket echo service for demo
-            // In production, you'd use your own WebSocket server
-            socket = new WebSocket('wss://socketsbay.com/wss/v2/1/demo/');
-            
-            socket.onopen = function() {
+            // Connect to the same origin (works for Render deployment)
+            socket = io();
+
+            socket.on('connect', () => {
                 console.log('Connected to server');
-            };
+                isConnected = true;
+                updateConnectionStatus(true);
+                showSuccess('Connected to server!');
+                
+                // Send nickname on connection
+                socket.emit('set-nickname', myNickname);
+            });
 
-            socket.onmessage = function(event) {
-                try {
-                    const data = JSON.parse(event.data);
-                    if (data.userId && data.userId !== userId) {
-                        updateUserLocation(data);
-                    }
-                } catch (e) {
-                    console.error('Error parsing message:', e);
-                }
-            };
-
-            socket.onclose = function() {
+            socket.on('disconnect', () => {
                 console.log('Disconnected from server');
-                setTimeout(initSocket, 3000); // Reconnect after 3 seconds
-            };
+                isConnected = false;
+                updateConnectionStatus(false);
+                showError('Disconnected from server. Reconnecting...');
+                
+                // Clear all users from list
+                activeUsersList.clear();
+                updateUsersList();
+            });
 
-            socket.onerror = function(error) {
-                console.error('WebSocket error:', error);
-                showError('Connection error. Please refresh the page.');
-            };
+            socket.on('connect_error', (error) => {
+                console.error('Connection error:', error);
+                updateConnectionStatus(false);
+            });
+
+            // Handle receiving active users list (when first connecting)
+            socket.on('active-users', (users) => {
+                console.log('Received active users:', users);
+                activeUsersList.clear();
+                users.forEach(user => {
+                    activeUsersList.set(user.userId, user.nickname || 'Anonymous');
+                    updateUserLocation(user);
+                });
+                updateUsersList();
+            });
+
+            // Handle new user joining
+            socket.on('user-joined', (data) => {
+                console.log('User joined:', data.userId, data.nickname);
+                activeUsersList.set(data.userId, data.nickname || 'Anonymous');
+                showSuccess(`${data.nickname || 'Anonymous'} joined!`);
+                updateUsersList();
+            });
+
+            // Handle user location updates
+            socket.on('user-location', (data) => {
+                activeUsersList.set(data.userId, data.nickname || 'Anonymous');
+                updateUserLocation(data);
+                updateUsersList();
+            });
+
+            // Handle nickname updates
+            socket.on('nickname-updated', (data) => {
+                console.log('Nickname updated:', data);
+                activeUsersList.set(data.userId, data.nickname);
+                
+                // Update marker label if exists
+                if (markers[data.userId]) {
+                    const marker = markers[data.userId];
+                    marker.unbindTooltip();
+                    marker.bindTooltip(data.nickname, {
+                        permanent: true,
+                        direction: 'top',
+                        offset: [0, -10],
+                        className: 'marker-label'
+                    });
+                }
+                
+                updateUsersList();
+                showSuccess(`${data.oldNickname} is now ${data.nickname}`);
+            });
+
+            // Handle user leaving
+            socket.on('user-left', (data) => {
+                console.log('User left:', data.userId);
+                const nickname = activeUsersList.get(data.userId) || 'Anonymous';
+                activeUsersList.delete(data.userId);
+                
+                if (markers[data.userId]) {
+                    map.removeLayer(markers[data.userId]);
+                    delete markers[data.userId];
+                }
+                
+                updateUsersList();
+                showSuccess(`${nickname} left`);
+            });
+        }
+
+        // Update connection status indicator
+        function updateConnectionStatus(connected) {
+            const dot = document.getElementById('connectionDot');
+            const text = document.getElementById('connectionText');
+            
+            if (connected) {
+                dot.className = 'connection-dot connected';
+                text.textContent = 'Connected';
+            } else {
+                dot.className = 'connection-dot';
+                text.textContent = 'Disconnected';
+            }
+        }
+
+        // Show nickname modal
+        function showNicknameModal() {
+            const modal = document.getElementById('nicknameModal');
+            const input = document.getElementById('nicknameInput');
+            modal.classList.add('active');
+            input.value = myNickname === 'Anonymous' ? '' : myNickname;
+            input.focus();
+        }
+
+        // Close nickname modal
+        function closeNicknameModal() {
+            document.getElementById('nicknameModal').classList.remove('active');
+        }
+
+        // Save nickname
+        function saveNickname() {
+            const input = document.getElementById('nicknameInput');
+            const nickname = input.value.trim();
+            
+            if (nickname.length < 3) {
+                showError('Nickname must be at least 3 characters');
+                return;
+            }
+            
+            const oldNickname = myNickname;
+            myNickname = nickname;
+            localStorage.setItem('userNickname', nickname);
+            document.getElementById('currentNickname').textContent = nickname;
+            
+            // Update nickname on server
+            if (socket && isConnected) {
+                socket.emit('update-nickname', { oldNickname, newNickname: nickname });
+            }
+            
+            // Update my marker label if sharing
+            if (myMarker) {
+                myMarker.unbindTooltip();
+                myMarker.bindTooltip(nickname, {
+                    permanent: true,
+                    direction: 'top',
+                    offset: [0, -10],
+                    className: 'marker-label'
+                });
+            }
+            
+            closeNicknameModal();
+            showSuccess('Nickname updated successfully!');
+        }
+
+        // Update users list panel
+        function updateUsersList() {
+            const container = document.getElementById('usersContainer');
+            const count = activeUsersList.size + (isSharing ? 1 : 0);
+            document.getElementById('userCount').textContent = count;
+            document.getElementById('activeUsers').textContent = count;
+            
+            container.innerHTML = '';
+            
+            // Add myself if sharing
+            if (isSharing) {
+                const myItem = document.createElement('div');
+                myItem.className = 'user-item me';
+                myItem.innerHTML = `
+                    <div class="user-dot active"></div>
+                    <span>${myNickname} (You)</span>
+                `;
+                container.appendChild(myItem);
+            }
+            
+            // Add other users
+            activeUsersList.forEach((nickname, userId) => {
+                const userItem = document.createElement('div');
+                userItem.className = 'user-item';
+                userItem.innerHTML = `
+                    <div class="user-dot other"></div>
+                    <span>${nickname}</span>
+                `;
+                container.appendChild(userItem);
+            });
+            
+            if (count === 0) {
+                container.innerHTML = '<div style="color: #94a3b8; text-align: center; padding: 10px;">No active users</div>';
+            }
         }
 
         // Start sharing location
         function startSharing() {
             if (!navigator.geolocation) {
                 showError('Geolocation is not supported by your browser');
+                return;
+            }
+
+            if (!isConnected) {
+                showError('Not connected to server. Please wait...');
+                return;
+            }
+
+            // Prompt for nickname if still Anonymous
+            if (myNickname === 'Anonymous') {
+                showNicknameModal();
+                showError('Please set a nickname first');
                 return;
             }
 
@@ -372,27 +803,35 @@
                             iconSize: [24, 24]
                         });
                         myMarker = L.marker([lat, lng], { icon: myIcon }).addTo(map);
+                        myMarker.bindTooltip(myNickname, {
+                            permanent: true,
+                            direction: 'top',
+                            offset: [0, -10],
+                            className: 'marker-label'
+                        });
                         map.setView([lat, lng], 15);
+                        showSuccess('Location sharing started!');
                     } else {
                         myMarker.setLatLng([lat, lng]);
                     }
 
-                    // Broadcast location
-                    if (socket && socket.readyState === WebSocket.OPEN) {
-                        const locationData = {
-                            userId: userId,
+                    // Emit location to server
+                    if (socket && isConnected) {
+                        socket.emit('location-update', {
                             lat: lat,
                             lng: lng,
                             accuracy: accuracy,
-                            timestamp: Date.now()
-                        };
-                        socket.send(JSON.stringify(locationData));
+                            nickname: myNickname
+                        });
                         updateCounter++;
                         document.getElementById('updateCount').textContent = updateCounter;
                     }
 
                     // Update accuracy display
                     document.getElementById('accuracy').textContent = accuracy + 'm';
+
+                    // Update users list
+                    updateUsersList();
 
                     // Clear any error messages
                     hideError();
@@ -443,46 +882,50 @@
                 myMarker = null;
             }
 
-            // Notify others that I've stopped sharing
-            if (socket && socket.readyState === WebSocket.OPEN) {
-                socket.send(JSON.stringify({
-                    userId: userId,
-                    type: 'disconnect'
-                }));
+            // Notify server
+            if (socket && isConnected) {
+                socket.emit('stop-sharing');
             }
+
+            updateUsersList();
+            showSuccess('Stopped sharing location');
         }
 
         // Update other user's location on map
         function updateUserLocation(data) {
-            if (data.type === 'disconnect') {
-                // Remove user marker
-                if (markers[data.userId]) {
-                    map.removeLayer(markers[data.userId]);
-                    delete markers[data.userId];
-                }
-            } else {
-                // Update or create user marker
-                if (!markers[data.userId]) {
-                    const userIcon = L.divIcon({
-                        className: 'user-marker',
-                        iconSize: [20, 20]
-                    });
-                    markers[data.userId] = L.marker([data.lat, data.lng], { icon: userIcon }).addTo(map);
-                } else {
-                    markers[data.userId].setLatLng([data.lat, data.lng]);
-                }
-            }
+            if (!data.lat || !data.lng) return;
 
-            // Update active users count
-            const activeCount = Object.keys(markers).length + (isSharing ? 1 : 0);
-            document.getElementById('activeUsers').textContent = activeCount;
+            const nickname = data.nickname || 'Anonymous';
+
+            // Update or create user marker
+            if (!markers[data.userId]) {
+                const userIcon = L.divIcon({
+                    className: 'user-marker',
+                    iconSize: [20, 20]
+                });
+                markers[data.userId] = L.marker([data.lat, data.lng], { 
+                    icon: userIcon
+                }).addTo(map);
+                
+                markers[data.userId].bindTooltip(nickname, {
+                    permanent: true,
+                    direction: 'top',
+                    offset: [0, -10],
+                    className: 'marker-label'
+                });
+            } else {
+                markers[data.userId].setLatLng([data.lat, data.lng]);
+            }
         }
 
         // Show error message
         function showError(message) {
             const errorDiv = document.getElementById('errorMessage');
+            const successDiv = document.getElementById('successMessage');
+            successDiv.style.display = 'none';
             errorDiv.textContent = message;
             errorDiv.style.display = 'block';
+            setTimeout(hideError, 5000);
         }
 
         // Hide error message
@@ -490,19 +933,29 @@
             document.getElementById('errorMessage').style.display = 'none';
         }
 
+        // Show success message
+        function showSuccess(message) {
+            const successDiv = document.getElementById('successMessage');
+            const errorDiv = document.getElementById('errorMessage');
+            errorDiv.style.display = 'none';
+            successDiv.textContent = message;
+            successDiv.style.display = 'block';
+            setTimeout(() => {
+                successDiv.style.display = 'none';
+            }, 3000);
+        }
+
         // Initialize everything when page loads
         window.onload = function() {
             initMap();
             initSocket();
+            updateUsersList();
         };
 
         // Clean up when page unloads
         window.onbeforeunload = function() {
             if (isSharing) {
                 stopSharing();
-            }
-            if (socket) {
-                socket.close();
             }
         };
     </script>
