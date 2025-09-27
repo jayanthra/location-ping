@@ -1,0 +1,510 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Live Location Broadcaster</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .header {
+            text-align: center;
+            color: white;
+            margin-bottom: 30px;
+            animation: fadeIn 0.5s ease-in;
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+        }
+
+        .header p {
+            opacity: 0.9;
+            font-size: 1.1em;
+        }
+
+        .main-card {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            overflow: hidden;
+            animation: slideUp 0.6s ease-out;
+        }
+
+        .controls {
+            padding: 25px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .status-info {
+            color: white;
+        }
+
+        .status-indicator {
+            display: inline-block;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            margin-right: 8px;
+            animation: pulse 2s infinite;
+        }
+
+        .status-indicator.active {
+            background: #4ade80;
+            box-shadow: 0 0 10px #4ade80;
+        }
+
+        .status-indicator.inactive {
+            background: #f87171;
+            box-shadow: 0 0 10px #f87171;
+        }
+
+        #map {
+            height: 500px;
+            width: 100%;
+        }
+
+        .btn {
+            padding: 12px 30px;
+            border: none;
+            border-radius: 30px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .btn-primary {
+            background: white;
+            color: #667eea;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+        }
+
+        .btn-danger {
+            background: #ef4444;
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background: #dc2626;
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+        }
+
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        .info-panel {
+            padding: 20px;
+            background: #f8fafc;
+            border-top: 1px solid #e2e8f0;
+        }
+
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-top: 15px;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 15px;
+            border-radius: 12px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            transition: transform 0.3s ease;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+        }
+
+        .stat-value {
+            font-size: 2em;
+            font-weight: bold;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .stat-label {
+            color: #64748b;
+            font-size: 0.9em;
+            margin-top: 5px;
+        }
+
+        .user-marker {
+            background: #667eea;
+            border: 3px solid white;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+        }
+
+        .my-marker {
+            background: #4ade80;
+            border: 3px solid white;
+            border-radius: 50%;
+            width: 24px;
+            height: 24px;
+            box-shadow: 0 0 20px rgba(74, 222, 128, 0.8);
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% {
+                box-shadow: 0 0 0 0 rgba(74, 222, 128, 0.7);
+            }
+            70% {
+                box-shadow: 0 0 0 20px rgba(74, 222, 128, 0);
+            }
+            100% {
+                box-shadow: 0 0 0 0 rgba(74, 222, 128, 0);
+            }
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .error-message {
+            background: #fee2e2;
+            color: #dc2626;
+            padding: 15px;
+            border-radius: 10px;
+            margin: 15px 0;
+            display: none;
+        }
+
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 1.8em;
+            }
+            
+            #map {
+                height: 400px;
+            }
+
+            .controls {
+                justify-content: center;
+                text-align: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🌍 Live Location Broadcaster</h1>
+            <p>Share your location in real-time with everyone on this page</p>
+        </div>
+
+        <div class="main-card">
+            <div class="controls">
+                <div class="status-info">
+                    <span class="status-indicator inactive" id="statusIndicator"></span>
+                    <span id="statusText">Not sharing location</span>
+                </div>
+                <div>
+                    <button class="btn btn-primary" id="startBtn" onclick="startSharing()">
+                        Start Broadcasting
+                    </button>
+                    <button class="btn btn-danger" id="stopBtn" onclick="stopSharing()" style="display: none;">
+                        Stop Broadcasting
+                    </button>
+                </div>
+            </div>
+
+            <div id="map"></div>
+
+            <div class="info-panel">
+                <div class="error-message" id="errorMessage"></div>
+                <div class="stats">
+                    <div class="stat-card">
+                        <div class="stat-value" id="activeUsers">0</div>
+                        <div class="stat-label">Active Users</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="accuracy">-</div>
+                        <div class="stat-label">GPS Accuracy</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="updateCount">0</div>
+                        <div class="stat-label">Updates Sent</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="https://cdn.socket.io/4.5.4/socket.io.min.js"></script>
+    <script>
+        // Initialize variables
+        let map;
+        let myMarker;
+        let markers = {};
+        let socket;
+        let watchId;
+        let userId = 'user_' + Math.random().toString(36).substr(2, 9);
+        let updateCounter = 0;
+        let isSharing = false;
+
+        // Initialize map
+        function initMap() {
+            map = L.map('map').setView([51.505, -0.09], 13);
+            
+            // Add dark tile layer for better contrast
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '© OpenStreetMap contributors',
+                maxZoom: 19
+            }).addTo(map);
+        }
+
+        // Initialize WebSocket connection
+        function initSocket() {
+            // Using a public WebSocket echo service for demo
+            // In production, you'd use your own WebSocket server
+            socket = new WebSocket('wss://socketsbay.com/wss/v2/1/demo/');
+            
+            socket.onopen = function() {
+                console.log('Connected to server');
+            };
+
+            socket.onmessage = function(event) {
+                try {
+                    const data = JSON.parse(event.data);
+                    if (data.userId && data.userId !== userId) {
+                        updateUserLocation(data);
+                    }
+                } catch (e) {
+                    console.error('Error parsing message:', e);
+                }
+            };
+
+            socket.onclose = function() {
+                console.log('Disconnected from server');
+                setTimeout(initSocket, 3000); // Reconnect after 3 seconds
+            };
+
+            socket.onerror = function(error) {
+                console.error('WebSocket error:', error);
+                showError('Connection error. Please refresh the page.');
+            };
+        }
+
+        // Start sharing location
+        function startSharing() {
+            if (!navigator.geolocation) {
+                showError('Geolocation is not supported by your browser');
+                return;
+            }
+
+            isSharing = true;
+            document.getElementById('startBtn').style.display = 'none';
+            document.getElementById('stopBtn').style.display = 'inline-block';
+            document.getElementById('statusIndicator').className = 'status-indicator active';
+            document.getElementById('statusText').textContent = 'Broadcasting location';
+
+            // Get location updates
+            watchId = navigator.geolocation.watchPosition(
+                (position) => {
+                    const lat = position.coords.latitude;
+                    const lng = position.coords.longitude;
+                    const accuracy = Math.round(position.coords.accuracy);
+
+                    // Update my marker
+                    if (!myMarker) {
+                        const myIcon = L.divIcon({
+                            className: 'my-marker',
+                            iconSize: [24, 24]
+                        });
+                        myMarker = L.marker([lat, lng], { icon: myIcon }).addTo(map);
+                        map.setView([lat, lng], 15);
+                    } else {
+                        myMarker.setLatLng([lat, lng]);
+                    }
+
+                    // Broadcast location
+                    if (socket && socket.readyState === WebSocket.OPEN) {
+                        const locationData = {
+                            userId: userId,
+                            lat: lat,
+                            lng: lng,
+                            accuracy: accuracy,
+                            timestamp: Date.now()
+                        };
+                        socket.send(JSON.stringify(locationData));
+                        updateCounter++;
+                        document.getElementById('updateCount').textContent = updateCounter;
+                    }
+
+                    // Update accuracy display
+                    document.getElementById('accuracy').textContent = accuracy + 'm';
+
+                    // Clear any error messages
+                    hideError();
+                },
+                (error) => {
+                    console.error('Location error:', error);
+                    let errorMsg = 'Unable to get location: ';
+                    switch(error.code) {
+                        case error.PERMISSION_DENIED:
+                            errorMsg += 'Permission denied. Please allow location access.';
+                            break;
+                        case error.POSITION_UNAVAILABLE:
+                            errorMsg += 'Location information unavailable.';
+                            break;
+                        case error.TIMEOUT:
+                            errorMsg += 'Location request timed out.';
+                            break;
+                        default:
+                            errorMsg += 'Unknown error occurred.';
+                    }
+                    showError(errorMsg);
+                    stopSharing();
+                },
+                {
+                    enableHighAccuracy: true,
+                    timeout: 10000,
+                    maximumAge: 0
+                }
+            );
+        }
+
+        // Stop sharing location
+        function stopSharing() {
+            isSharing = false;
+            if (watchId) {
+                navigator.geolocation.clearWatch(watchId);
+                watchId = null;
+            }
+
+            document.getElementById('startBtn').style.display = 'inline-block';
+            document.getElementById('stopBtn').style.display = 'none';
+            document.getElementById('statusIndicator').className = 'status-indicator inactive';
+            document.getElementById('statusText').textContent = 'Not sharing location';
+
+            // Remove my marker
+            if (myMarker) {
+                map.removeLayer(myMarker);
+                myMarker = null;
+            }
+
+            // Notify others that I've stopped sharing
+            if (socket && socket.readyState === WebSocket.OPEN) {
+                socket.send(JSON.stringify({
+                    userId: userId,
+                    type: 'disconnect'
+                }));
+            }
+        }
+
+        // Update other user's location on map
+        function updateUserLocation(data) {
+            if (data.type === 'disconnect') {
+                // Remove user marker
+                if (markers[data.userId]) {
+                    map.removeLayer(markers[data.userId]);
+                    delete markers[data.userId];
+                }
+            } else {
+                // Update or create user marker
+                if (!markers[data.userId]) {
+                    const userIcon = L.divIcon({
+                        className: 'user-marker',
+                        iconSize: [20, 20]
+                    });
+                    markers[data.userId] = L.marker([data.lat, data.lng], { icon: userIcon }).addTo(map);
+                } else {
+                    markers[data.userId].setLatLng([data.lat, data.lng]);
+                }
+            }
+
+            // Update active users count
+            const activeCount = Object.keys(markers).length + (isSharing ? 1 : 0);
+            document.getElementById('activeUsers').textContent = activeCount;
+        }
+
+        // Show error message
+        function showError(message) {
+            const errorDiv = document.getElementById('errorMessage');
+            errorDiv.textContent = message;
+            errorDiv.style.display = 'block';
+        }
+
+        // Hide error message
+        function hideError() {
+            document.getElementById('errorMessage').style.display = 'none';
+        }
+
+        // Initialize everything when page loads
+        window.onload = function() {
+            initMap();
+            initSocket();
+        };
+
+        // Clean up when page unloads
+        window.onbeforeunload = function() {
+            if (isSharing) {
+                stopSharing();
+            }
+            if (socket) {
+                socket.close();
+            }
+        };
+    </script>
+</body>
+</html>
