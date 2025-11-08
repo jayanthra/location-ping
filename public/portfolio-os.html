@@ -1,0 +1,472 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DevOS - Portfolio</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Courier New', monospace;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            height: 100vh;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .desktop {
+            height: calc(100vh - 50px);
+            position: relative;
+            padding: 20px;
+        }
+
+        .desktop-icon {
+            width: 80px;
+            text-align: center;
+            cursor: pointer;
+            margin-bottom: 20px;
+            transition: transform 0.2s;
+        }
+
+        .desktop-icon:hover {
+            transform: scale(1.1);
+        }
+
+        .icon-image {
+            width: 60px;
+            height: 60px;
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 8px;
+            margin: 0 auto 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 32px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+        }
+
+        .icon-label {
+            color: white;
+            font-size: 12px;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
+        }
+
+        .window {
+            position: absolute;
+            background: #f0f0f0;
+            border: 2px solid #000;
+            border-radius: 8px;
+            box-shadow: 5px 5px 15px rgba(0, 0, 0, 0.3);
+            display: none;
+            flex-direction: column;
+            min-width: 400px;
+            max-width: 800px;
+        }
+
+        .window.active {
+            display: flex;
+        }
+
+        .window-header {
+            background: linear-gradient(180deg, #0078d7 0%, #0056b3 100%);
+            color: white;
+            padding: 8px 12px;
+            cursor: move;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-radius: 6px 6px 0 0;
+        }
+
+        .window-title {
+            font-weight: bold;
+            font-size: 14px;
+        }
+
+        .window-controls {
+            display: flex;
+            gap: 8px;
+        }
+
+        .window-button {
+            width: 20px;
+            height: 20px;
+            border: 1px solid #fff;
+            background: rgba(255, 255, 255, 0.2);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            border-radius: 3px;
+        }
+
+        .window-button:hover {
+            background: rgba(255, 255, 255, 0.4);
+        }
+
+        .window-content {
+            padding: 20px;
+            background: white;
+            flex-grow: 1;
+            overflow-y: auto;
+            max-height: 500px;
+        }
+
+        .taskbar {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 50px;
+            background: linear-gradient(180deg, #2c3e50 0%, #1a252f 100%);
+            display: flex;
+            align-items: center;
+            padding: 0 10px;
+            box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.3);
+        }
+
+        .start-button {
+            background: linear-gradient(180deg, #0078d7 0%, #0056b3 100%);
+            color: white;
+            border: none;
+            padding: 8px 20px;
+            cursor: pointer;
+            font-weight: bold;
+            border-radius: 4px;
+            font-family: 'Courier New', monospace;
+        }
+
+        .start-button:hover {
+            background: linear-gradient(180deg, #0056b3 0%, #003d82 100%);
+        }
+
+        .taskbar-time {
+            margin-left: auto;
+            color: white;
+            font-size: 14px;
+            padding: 8px 15px;
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 4px;
+        }
+
+        .project-card {
+            background: #f9f9f9;
+            border: 1px solid #ddd;
+            padding: 15px;
+            margin-bottom: 15px;
+            border-radius: 4px;
+        }
+
+        .project-card h3 {
+            color: #0078d7;
+            margin-bottom: 10px;
+        }
+
+        .skill-tag {
+            display: inline-block;
+            background: #0078d7;
+            color: white;
+            padding: 4px 10px;
+            margin: 4px;
+            border-radius: 12px;
+            font-size: 12px;
+        }
+
+        .terminal {
+            background: #1e1e1e;
+            color: #00ff00;
+            padding: 15px;
+            font-family: 'Courier New', monospace;
+            border-radius: 4px;
+            line-height: 1.6;
+        }
+
+        .terminal-prompt::before {
+            content: "$ ";
+            color: #00ff00;
+        }
+
+        a {
+            color: #0078d7;
+            text-decoration: none;
+        }
+
+        a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <div class="desktop" id="desktop">
+        <!-- Desktop Icons -->
+        <div class="desktop-icon" onclick="openWindow('about')">
+            <div class="icon-image">👤</div>
+            <div class="icon-label">About Me</div>
+        </div>
+
+        <div class="desktop-icon" onclick="openWindow('projects')">
+            <div class="icon-image">💼</div>
+            <div class="icon-label">Projects</div>
+        </div>
+
+        <div class="desktop-icon" onclick="openWindow('skills')">
+            <div class="icon-image">⚡</div>
+            <div class="icon-label">Skills</div>
+        </div>
+
+        <div class="desktop-icon" onclick="openWindow('contact')">
+            <div class="icon-image">📧</div>
+            <div class="icon-label">Contact</div>
+        </div>
+
+        <div class="desktop-icon" onclick="openWindow('terminal')">
+            <div class="icon-image">⌨️</div>
+            <div class="icon-label">Terminal</div>
+        </div>
+    </div>
+
+    <!-- Windows -->
+    <div class="window" id="about-window" style="top: 100px; left: 150px;">
+        <div class="window-header" onmousedown="startDrag(event, 'about-window')">
+            <div class="window-title">About Me</div>
+            <div class="window-controls">
+                <div class="window-button" onclick="closeWindow('about')">✕</div>
+            </div>
+        </div>
+        <div class="window-content">
+            <h2>Hello, I'm a Software Engineer 👋</h2>
+            <p style="margin-top: 15px; line-height: 1.8;">
+                I'm a passionate software engineer with expertise in building scalable web applications 
+                and solving complex problems. I love creating beautiful, functional software that makes 
+                a difference in people's lives.
+            </p>
+            <p style="margin-top: 15px; line-height: 1.8;">
+                When I'm not coding, you can find me exploring new technologies, contributing to open-source 
+                projects, or sharing knowledge with the developer community.
+            </p>
+            <div style="margin-top: 20px;">
+                <strong>Experience:</strong> 5+ years in full-stack development<br>
+                <strong>Location:</strong> San Francisco, CA<br>
+                <strong>Education:</strong> BS in Computer Science
+            </div>
+        </div>
+    </div>
+
+    <div class="window" id="projects-window" style="top: 120px; left: 200px;">
+        <div class="window-header" onmousedown="startDrag(event, 'projects-window')">
+            <div class="window-title">Projects</div>
+            <div class="window-controls">
+                <div class="window-button" onclick="closeWindow('projects')">✕</div>
+            </div>
+        </div>
+        <div class="window-content">
+            <div class="project-card">
+                <h3>🚀 E-Commerce Platform</h3>
+                <p>Built a full-stack e-commerce solution with React, Node.js, and MongoDB. 
+                   Handles 10k+ daily active users with real-time inventory management.</p>
+                <div style="margin-top: 10px;">
+                    <span class="skill-tag">React</span>
+                    <span class="skill-tag">Node.js</span>
+                    <span class="skill-tag">MongoDB</span>
+                </div>
+            </div>
+
+            <div class="project-card">
+                <h3>🤖 AI Chat Application</h3>
+                <p>Developed an intelligent chatbot using NLP and machine learning. 
+                   Integrated with multiple APIs for enhanced functionality.</p>
+                <div style="margin-top: 10px;">
+                    <span class="skill-tag">Python</span>
+                    <span class="skill-tag">TensorFlow</span>
+                    <span class="skill-tag">Flask</span>
+                </div>
+            </div>
+
+            <div class="project-card">
+                <h3>📊 Analytics Dashboard</h3>
+                <p>Created a real-time analytics dashboard with interactive visualizations 
+                   for business intelligence and data insights.</p>
+                <div style="margin-top: 10px;">
+                    <span class="skill-tag">Vue.js</span>
+                    <span class="skill-tag">D3.js</span>
+                    <span class="skill-tag">PostgreSQL</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="window" id="skills-window" style="top: 140px; left: 250px;">
+        <div class="window-header" onmousedown="startDrag(event, 'skills-window')">
+            <div class="window-title">Skills & Technologies</div>
+            <div class="window-controls">
+                <div class="window-button" onclick="closeWindow('skills')">✕</div>
+            </div>
+        </div>
+        <div class="window-content">
+            <h3>Frontend</h3>
+            <div style="margin: 10px 0;">
+                <span class="skill-tag">JavaScript</span>
+                <span class="skill-tag">TypeScript</span>
+                <span class="skill-tag">React</span>
+                <span class="skill-tag">Vue.js</span>
+                <span class="skill-tag">HTML/CSS</span>
+                <span class="skill-tag">Tailwind</span>
+            </div>
+
+            <h3 style="margin-top: 20px;">Backend</h3>
+            <div style="margin: 10px 0;">
+                <span class="skill-tag">Node.js</span>
+                <span class="skill-tag">Python</span>
+                <span class="skill-tag">Java</span>
+                <span class="skill-tag">Express</span>
+                <span class="skill-tag">Django</span>
+                <span class="skill-tag">GraphQL</span>
+            </div>
+
+            <h3 style="margin-top: 20px;">Database & Tools</h3>
+            <div style="margin: 10px 0;">
+                <span class="skill-tag">MongoDB</span>
+                <span class="skill-tag">PostgreSQL</span>
+                <span class="skill-tag">Redis</span>
+                <span class="skill-tag">Docker</span>
+                <span class="skill-tag">AWS</span>
+                <span class="skill-tag">Git</span>
+            </div>
+
+            <h3 style="margin-top: 20px;">Other</h3>
+            <div style="margin: 10px 0;">
+                <span class="skill-tag">Machine Learning</span>
+                <span class="skill-tag">CI/CD</span>
+                <span class="skill-tag">Agile</span>
+                <span class="skill-tag">Testing</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="window" id="contact-window" style="top: 160px; left: 300px;">
+        <div class="window-header" onmousedown="startDrag(event, 'contact-window')">
+            <div class="window-title">Contact</div>
+            <div class="window-controls">
+                <div class="window-button" onclick="closeWindow('contact')">✕</div>
+            </div>
+        </div>
+        <div class="window-content">
+            <h2>Let's Connect! 🤝</h2>
+            <p style="margin: 20px 0;">I'm always interested in hearing about new opportunities and projects.</p>
+            
+            <div style="line-height: 2.5;">
+                <div>📧 <strong>Email:</strong> <a href="mailto:dev@example.com">dev@example.com</a></div>
+                <div>🐙 <strong>GitHub:</strong> <a href="https://github.com/yourusername" target="_blank">github.com/yourusername</a></div>
+                <div>💼 <strong>LinkedIn:</strong> <a href="https://linkedin.com/in/yourprofile" target="_blank">linkedin.com/in/yourprofile</a></div>
+                <div>🐦 <strong>Twitter:</strong> <a href="https://twitter.com/yourhandle" target="_blank">@yourhandle</a></div>
+                <div>🌐 <strong>Website:</strong> <a href="https://yourwebsite.com" target="_blank">yourwebsite.com</a></div>
+            </div>
+
+            <div style="margin-top: 30px; padding: 15px; background: #f0f8ff; border-left: 4px solid #0078d7;">
+                <strong>Open to:</strong> Full-time positions, freelance projects, and consulting opportunities
+            </div>
+        </div>
+    </div>
+
+    <div class="window" id="terminal-window" style="top: 180px; left: 350px;">
+        <div class="window-header" onmousedown="startDrag(event, 'terminal-window')">
+            <div class="window-title">Terminal</div>
+            <div class="window-controls">
+                <div class="window-button" onclick="closeWindow('terminal')">✕</div>
+            </div>
+        </div>
+        <div class="window-content" style="padding: 0;">
+            <div class="terminal">
+                <div class="terminal-prompt">whoami</div>
+                <div>Software Engineer | Full-Stack Developer | Problem Solver</div>
+                <br>
+                <div class="terminal-prompt">cat skills.txt</div>
+                <div>- Frontend: React, Vue.js, TypeScript</div>
+                <div>- Backend: Node.js, Python, Java</div>
+                <div>- Database: MongoDB, PostgreSQL</div>
+                <div>- DevOps: Docker, AWS, CI/CD</div>
+                <br>
+                <div class="terminal-prompt">echo $PASSION</div>
+                <div>"Building amazing software that solves real problems"</div>
+                <br>
+                <div class="terminal-prompt">ls -l achievements/</div>
+                <div>✓ Led development of 3 major product launches</div>
+                <div>✓ Contributed to 50+ open-source projects</div>
+                <div>✓ Mentored 10+ junior developers</div>
+                <div>✓ Speaker at tech conferences</div>
+                <br>
+                <div class="terminal-prompt"><span style="animation: blink 1s infinite;">█</span></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="taskbar">
+        <button class="start-button" onclick="alert('Welcome to DevOS! Click on the desktop icons to explore my portfolio.')">⊞ Start</button>
+        <div class="taskbar-time" id="clock"></div>
+    </div>
+
+    <script>
+        let draggedWindow = null;
+        let offsetX = 0;
+        let offsetY = 0;
+
+        function openWindow(windowId) {
+            const window = document.getElementById(windowId + '-window');
+            window.classList.add('active');
+        }
+
+        function closeWindow(windowId) {
+            const window = document.getElementById(windowId + '-window');
+            window.classList.remove('active');
+        }
+
+        function startDrag(e, windowId) {
+            draggedWindow = document.getElementById(windowId);
+            const rect = draggedWindow.getBoundingClientRect();
+            offsetX = e.clientX - rect.left;
+            offsetY = e.clientY - rect.top;
+            
+            document.addEventListener('mousemove', drag);
+            document.addEventListener('mouseup', stopDrag);
+        }
+
+        function drag(e) {
+            if (draggedWindow) {
+                draggedWindow.style.left = (e.clientX - offsetX) + 'px';
+                draggedWindow.style.top = (e.clientY - offsetY) + 'px';
+            }
+        }
+
+        function stopDrag() {
+            draggedWindow = null;
+            document.removeEventListener('mousemove', drag);
+            document.removeEventListener('mouseup', stopDrag);
+        }
+
+        function updateClock() {
+            const now = new Date();
+            const hours = now.getHours().toString().padStart(2, '0');
+            const minutes = now.getMinutes().toString().padStart(2, '0');
+            document.getElementById('clock').textContent = hours + ':' + minutes;
+        }
+
+        updateClock();
+        setInterval(updateClock, 1000);
+
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes blink {
+                0%, 50% { opacity: 1; }
+                51%, 100% { opacity: 0; }
+            }
+        `;
+        document.head.appendChild(style);
+    </script>
+</body>
+</html>
